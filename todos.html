@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/index.css">
+  <link rel="stylesheet" href="css/app.css">
+  <script src="./lib/angular.min.js"></script>
+</head>
+
+<body ng-app="todosApp">
+  <section class="todoapp" ng-controller="listCtrl">
+
+    <header class="header">
+      <h1>任务清单</h1>
+      <form ng-submit="add()">
+        <input class="new-todo" ng-model="todoName" placeholder="列出你要完成的事项" autofocus>
+      </form>
+    </header>
+
+    <section class="main">
+      <!--所有复选框-->
+      <input class="toggle-all" type="checkbox">
+      <!--列表-->
+      <ul class="todo-list" ng-repeat="item in list">
+        <li ng-class="{completed:item.isFinished}">
+          <div class="view">
+            <!--复选框-->
+            <input class="toggle" type="checkbox" ng-click="toggle(item.id)">
+            <!--内容-->
+            <label>{{item.name}}</label>
+            <!--删除单条按钮-->
+            <button class="destroy" ng-click="delete(item.id)"></button>
+          </div>
+          <input class="edit" value="Create a TodoMVC template">
+        </li>
+        <!-- <li class="completed">
+                    <div class="view">
+                        <input class="toggle" type="checkbox">
+                        <label>买1只独角兽</label>
+                        <button class="destroy"></button>
+                    </div>
+                    <input class="edit" value="Rule the web">
+                </li> -->
+      </ul>
+    </section>
+    <footer class="footer">
+      <span class="todo-count">还有<strong>{{left}}</strong>项未完成</span>
+      <button class="clear-completed" ng-click="clear()">清除已完成</button>
+    </footer>
+  </section>
+  <footer class="info">
+  </footer>
+  <script>
+    var app = angular.module('todosApp',[]);
+    app.controller('listCtrl',['$scope',function($scope){
+      $scope.list = [];
+      $scope.left = 0;
+      $scope.id = 1;
+      // 添加任务条
+      $scope.add = function(){
+        $scope.list.push({
+          id:$scope.id++,
+          name:$scope.todoName,
+          isFinished:false
+        });
+        console.log($scope.list);
+        $scope.todoName = '';//提交完即清空输入框
+        $scope.getLeft();
+      };
+      // 选择任务条，选中出现删除线，不选择，恢复原样子
+      $scope.toggle = function(id){
+        for (var index in $scope.list) {
+          if ($scope.list[index].id==id) {
+            $scope.list[index].isFinished = !$scope.list[index].isFinished;
+            break;
+          }
+        }
+        $scope.getLeft();
+      };
+
+      $scope.getLeft = function(){
+        // 遍历list数组，判断每一条中的isFinished是否为false，是则让left+1
+        // 然后在添加任务和删除任务的时候，重新判断===============================
+        $scope.left=0;//函数封闭了作用域，获取不到left，所以还要声明一个初始值
+        for(var index in $scope.list){
+          if($scope.list[index].isFinished == false){
+            $scope.left++;
+          }
+        }
+      }
+      // 删除任务
+      $scope.delete = function(id){
+        //点击的时候获取id，
+        //遍历数组，删除此id的任务条
+        for(var index in $scope.list){
+          if($scope.list[index].id==id){
+            $scope.list.splice(index,1);
+          }
+        }
+        $scope.getLeft();
+      };
+      // 清除未完成的任务
+      $scope.clear = function(){
+        // 遍历list数组，将其中为完成的放入一个新的数组
+        // 然后让list跟新为newArr
+
+        var newArr = [];
+        for(var index in $scope.list){
+          if($scope.list[index].isFinished == false){
+            newArr.push($scope.list[index]);
+          }
+        }
+        $scope.list = newArr;
+      }
+      
+    }]);
+
+  </script>
+
+</body>
+
+</html>
